@@ -23,6 +23,10 @@ Yipin Guo and Siddharth Joshi
 
 </div>
 
+---
+
+## 📖 Abstract
+
 SplitZip is a GPU-friendly lossless compressor for KV cache transfer in
 prefill-decode disaggregated LLM serving. It preserves BF16 KV tensors bitwise
 while reducing transfer volume and keeping both compression and decompression
@@ -35,7 +39,11 @@ through a sparse escape stream. The released artifact includes the public
 Triton codec and reproduction scripts for the BF16 exponent analysis and codec
 throughput measurements used in the paper.
 
-## Highlights
+<p align="center">
+  <img width="100%" src="figs/main.jpg" alt="Method Overview">
+</p>
+
+## 💡 Highlights
 
 - Lossless BF16 KV cache compression with bitwise round-trip recovery.
 - Chunk-local Top-16 exponent codebooks with sparse escapes for rare exponents.
@@ -45,17 +53,7 @@ throughput measurements used in the paper.
 - Paper-reported codec path performance on real BF16 KV activations:
   613.3 GB/s compression and 2181.8 GB/s decompression.
 
-## Repository Contents
-
-- `codec_gpu.py`: public ChunkLocalSplitZipGPU Triton codec.
-- `bench_codec_throughput.py`: encode/decode throughput benchmark for the public
-  codec API.
-- `analyze_bf16_exponent_entropy_qwen32.py`: BF16 KV exponent entropy and
-  Top-16 coverage analysis.
-- `splitzip.pdf`: included paper PDF.
-- `requirements.txt`: minimal Python runtime dependencies.
-
-## Installation
+## ⚒️ Installation
 
 SplitZip requires a CUDA-capable GPU and a PyTorch/Triton stack compatible with
 that GPU. The released scripts were checked against the `yipin_quant` conda
@@ -70,26 +68,6 @@ pip install -r requirements.txt
 
 If you already maintain a PyTorch CUDA environment, install the packages from
 `requirements.txt` there instead of creating a new environment.
-
-## Quick Start
-
-Run a small codec smoke test with synthetic BF16 data:
-
-```bash
-python bench_codec_throughput.py \
-  --device cuda:0 \
-  --synthetic \
-  --calibrate-on-input \
-  --rows 1024 \
-  --hidden-dim 4096 \
-  --warmup 3 \
-  --iters 10 \
-  --repeats 2 \
-  --output splitzip_smoke.json
-```
-
-The benchmark verifies bitwise lossless recovery before reporting compression
-ratio and encode/decode throughput.
 
 ## Codec API
 
@@ -112,6 +90,26 @@ print(coverage, encoded.compressed_bytes)
 
 For paper-style experiments, calibrate the codebook on a separate calibration
 set rather than on the benchmark tensor itself.
+
+## Quick Start
+
+Run a small codec smoke test with synthetic BF16 data:
+
+```bash
+python bench_codec_throughput.py \
+  --device cuda:0 \
+  --synthetic \
+  --calibrate-on-input \
+  --rows 1024 \
+  --hidden-dim 4096 \
+  --warmup 3 \
+  --iters 10 \
+  --repeats 2 \
+  --output splitzip_smoke.json
+```
+
+The benchmark verifies bitwise lossless recovery before reporting compression
+ratio and encode/decode throughput.
 
 ## Reproducing Paper Artifact Scripts
 
@@ -159,20 +157,37 @@ python bench_codec_throughput.py \
 Use `--synthetic` and `--calibrate-on-input` only for kernel sanity checks; they
 are not the paper protocol.
 
-## Citation
+
+## 🗂️ Contents
+
+- `codec_gpu.py`: public ChunkLocalSplitZipGPU Triton codec.
+- `bench_codec_throughput.py`: encode/decode throughput benchmark for the public
+  codec API.
+- `analyze_bf16_exponent_entropy_qwen32.py`: BF16 KV exponent entropy and
+  Top-16 coverage analysis.
+- `splitzip.pdf`: included paper PDF.
+- `requirements.txt`: minimal Python runtime dependencies.
+
+## ⚒️ TODO
+
+- [ ] Merge SplitZip into Mooncake/SGLang disaggregation KV transfer.
+- [x] Release encode/decode kernel
+- [x] Results
+- [x] Citation
+
+## 📝 Citation
 
 If you find SplitZip useful in your research, please cite:
 
 ```bibtex
-@article{guo2026splitzip,
-  title         = {SplitZip: Ultra Fast Lossless KV Compression for Disaggregated LLM Serving},
-  author        = {Guo, Yipin and Joshi, Siddharth},
-  journal       = {arXiv preprint arXiv:2605.01708},
-  year          = {2026},
-  eprint        = {2605.01708},
-  archivePrefix = {arXiv},
-  primaryClass  = {cs.DC},
-  url           = {https://arxiv.org/abs/2605.01708}
+@misc{guo2026splitzipultrafastlossless,
+      title={SplitZip: Ultra Fast Lossless KV Compression for Disaggregated LLM Serving}, 
+      author={Yipin Guo and Siddharth Joshi},
+      year={2026},
+      eprint={2605.01708},
+      archivePrefix={arXiv},
+      primaryClass={cs.DC},
+      url={https://arxiv.org/abs/2605.01708}, 
 }
 ```
 
