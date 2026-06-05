@@ -18,7 +18,8 @@
 </p>
 
 <p>
-Yipin Guo and Siddharth Joshi
+  <a href="https://scholar.google.com/citations?user=wed16nIAAAAJ&hl=zh-TW">Yipin Guo</a>,
+  <a href="https://siddharth-joshi.com/">Siddharth Joshi</a>,
 </p>
 
 </div>
@@ -171,8 +172,8 @@ are not the paper protocol.
 ## ⚒️ TODO
 
 - [ ] Merge SplitZip into Mooncake/SGLang disaggregation KV transfer.
+- [x] Release entropy analysis and codec throughput script.
 - [x] Release encode/decode kernel
-- [x] Results
 - [x] Citation
 
 ## 📝 Citation
