@@ -6,6 +6,9 @@
   <a href="https://arxiv.org/abs/2605.01708">
     <img src="https://img.shields.io/badge/arXiv-2605.01708-b31b1b.svg?logo=arxiv" alt="arXiv">
   </a>
+  <a href="LICENSE">
+    <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT">
+  </a>
 </p>
 
 <p>
@@ -167,7 +170,6 @@ If you find SplitZip useful in your research, please cite:
 }
 ```
 
-## Release Checklist
+## License
 
-Before publishing the repository, add the final license file and update the
-citation if the paper receives venue or proceedings metadata.
+This project is released under the MIT License. See `LICENSE` for details.
