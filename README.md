@@ -6,6 +6,12 @@
   <a href="https://arxiv.org/abs/2605.01708">
     <img src="https://img.shields.io/badge/arXiv-2605.01708-b31b1b.svg?logo=arxiv" alt="arXiv">
   </a>
+  <a href="https://github.com/Intelligent-Microsystems-Lab/SplitZip">
+    <img src="https://img.shields.io/github/stars/Intelligent-Microsystems-Lab/SplitZip?style=social" alt="GitHub Stars">
+  </a>
+  <a href="https://github.com/Intelligent-Microsystems-Lab/SplitZip">
+    <img src="https://visitor-badge.laobi.icu/badge?page_id=Intelligent-Microsystems-Lab.SplitZip&right_color=violet" alt="Visitors">
+  </a>
   <a href="LICENSE">
     <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT">
   </a>
