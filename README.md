@@ -26,6 +26,12 @@
 
 ---
 
+## 🔥 News
+
+- **2026-06-05:** This repository is released.
+
+---
+
 ## 📖 Abstract
 
 SplitZip is a GPU-friendly lossless compressor for KV cache transfer in
@@ -53,6 +59,8 @@ throughput measurements used in the paper.
   throughput.
 - Paper-reported codec path performance on real BF16 KV activations:
   613.3 GB/s compression and 2181.8 GB/s decompression.
+
+---
 
 ## ⚒️ Installation
 
@@ -158,6 +166,7 @@ python bench_codec_throughput.py \
 Use `--synthetic` and `--calibrate-on-input` only for kernel sanity checks; they
 are not the paper protocol.
 
+---
 
 ## 🗂️ Contents
 
