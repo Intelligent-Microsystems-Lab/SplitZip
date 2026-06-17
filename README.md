@@ -1,6 +1,6 @@
 <div align="center">
 
-# SplitZip: Ultra Fast Lossless KV Compression for Disaggregated LLM Serving
+# SplitZip: Ultra-Fast Lossless KV Compression for Disaggregated LLM Serving
 
 <p>
   <a href="https://arxiv.org/abs/2605.01708">
@@ -9,9 +9,6 @@
   <a href="https://github.com/Intelligent-Microsystems-Lab/SplitZip">
     <img src="https://img.shields.io/github/stars/Intelligent-Microsystems-Lab/SplitZip?style=social" alt="GitHub Stars">
   </a>
-  <a href="https://github.com/Intelligent-Microsystems-Lab/SplitZip">
-    <img src="https://visitor-badge.laobi.icu/badge?page_id=Intelligent-Microsystems-Lab.SplitZip&right_color=violet" alt="Visitors">
-  </a>
   <a href="LICENSE">
     <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT">
   </a>
@@ -19,20 +16,20 @@
 
 <p>
   <a href="https://scholar.google.com/citations?user=wed16nIAAAAJ&hl=zh-TW">Yipin Guo</a>,
-  <a href="https://siddharth-joshi.com/">Siddharth Joshi</a>,
+  <a href="https://siddharth-joshi.com/">Siddharth Joshi</a>
 </p>
 
 </div>
 
 ---
 
-## 🔥 News
+## News
 
 - **2026-06-05:** This repository is released.
 
 ---
 
-## 📖 Abstract
+## Abstract
 
 SplitZip is a GPU-friendly lossless compressor for KV cache transfer in
 prefill-decode disaggregated LLM serving. It preserves BF16 KV tensors bitwise
@@ -47,27 +44,24 @@ Triton codec and reproduction scripts for the BF16 exponent analysis and codec
 throughput measurements used in the paper.
 
 <p align="center">
-  <img width="100%" src="figs/main.jpg" alt="Method Overview">
+  <img width="100%" src="figs/main.png" alt="Method Overview">
 </p>
 
-## 💡 Highlights
+## Highlights
 
 - Lossless BF16 KV cache compression with bitwise round-trip recovery.
-- Chunk-local Top-16 exponent codebooks with sparse escapes for rare exponents.
+- Offline-calibrated, Top-16 exponent codebooks with chunk-local sparse escape metadata.
 - GPU encode and decode kernels implemented in Triton.
-- Reproduction scripts for WikiText-2/Qwen3-32B exponent statistics and codec
-  throughput.
-- Paper-reported codec path performance on real BF16 KV activations:
-  613.3 GB/s compression and 2181.8 GB/s decompression.
+- Reproduction scripts for WikiText-2/Qwen3-32B exponent statistics and codec-path throughput.
+- Paper-reported codec-only throughput on real BF16 KV activations: 613.3 GB/s encode and 2181.8 GB/s decode.
+- Exercised in an out-of-tree SGLang disaggregated-serving path using Mooncake for KV-cache transfer. 
 
 ---
 
-## ⚒️ Installation
+## Installation
 
 SplitZip requires a CUDA-capable GPU and a PyTorch/Triton stack compatible with
-that GPU. The released scripts were checked against the `yipin_quant` conda
-environment, whose direct runtime dependencies are captured in
-`requirements.txt`.
+that GPU. The public scripts were testing with Python 3.12 and the dependencies outlined in `requirements.txt`.
 
 ```bash
 conda create -n splitzip python=3.12 -y
@@ -96,9 +90,7 @@ decoded = codec.decode(encoded)
 assert torch.equal(x.view(torch.int16), decoded.view(torch.int16))
 print(coverage, encoded.compressed_bytes)
 ```
-
-For paper-style experiments, calibrate the codebook on a separate calibration
-set rather than on the benchmark tensor itself.
+The current public codec API is stateful. The encoded objects are intended to be decoded with the same calibrated codec state. For paper-style experiments, calibrate the codebook on a separate calibration set rather than on the benchmark tensor itself.
 
 ## Quick Start
 
@@ -119,6 +111,13 @@ python bench_codec_throughput.py \
 
 The benchmark verifies bitwise lossless recovery before reporting compression
 ratio and encode/decode throughput.
+
+## Release Scope
+This initial release includes:
+- Standalone Triton encode/decode kernels for BF16 CUDA tensors.
+- A stateful calibrated codec API for bitwise BF16 round-trip recovery.
+- BF16 exponent-statistics analysis for Qwen3-32B/WikiText-2 style runs.
+- Codec-path throughput benchmarking.
 
 ## Reproducing Paper Artifact Scripts
 
@@ -168,24 +167,29 @@ are not the paper protocol.
 
 ---
 
-## 🗂️ Contents
+## Integration Status
+SplitZip has been exercised in an out-of-tree SGLang disaggregated-serving path using Mooncake for KV-cache transfer. This repository currently releases the
+  standalone Triton codec, BF16 exponent-analysis script, and codec-throughput benchmark.
+
+  The SGLang/Mooncake integration code is not included in this initial public release. We plan to document, publish, or upstream that integration path separately.
+
+
+## Repository Contents
 
 - `codec_gpu.py`: public ChunkLocalSplitZipGPU Triton codec.
 - `bench_codec_throughput.py`: encode/decode throughput benchmark for the public
   codec API.
 - `analyze_bf16_exponent_entropy_qwen32.py`: BF16 KV exponent entropy and
   Top-16 coverage analysis.
-- `splitzip.pdf`: included paper PDF.
 - `requirements.txt`: minimal Python runtime dependencies.
 
-## ⚒️ TODO
+## Roadmap
 
-- [ ] Merge SplitZip into Mooncake/SGLang disaggregation KV transfer.
-- [x] Release entropy analysis and codec throughput script.
-- [x] Release encode/decode kernel
-- [x] Citation
+- Publish, or upstream the out-of-tree SGLang/Mooncake KV-transfer integration.
+- Add integration-facing codebook/payload metadata for portable transfer boundaries.
+- Add CI after the initial artifact release.
 
-## 📝 Citation
+## Citation
 
 If you find SplitZip useful in your research, please cite:
 
