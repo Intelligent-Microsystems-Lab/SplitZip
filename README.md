@@ -32,6 +32,7 @@
 
 ## News
 
+- **2026-11:** We have integrated SplitZip into [Splash](https://github.com/incoai/splash) as a general-purpose KV compression method. Check out our [Pull Request #630](https://github.com/incoai/splash/pull/630) for more details.
 - **2026-09:** SplitZip is accepted to **NeurIPS 2026**.
 - **2026-06-05:** This repository is released.
 
