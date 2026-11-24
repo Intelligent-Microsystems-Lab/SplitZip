@@ -32,6 +32,7 @@
 
 ## News
 
+- **2026-11:** Added an FP8 codec (`codec_fp8_gpu.py`): SplitZip kernels for E4M3 and E5M2 KV caches with 2-, 3- and 4-bit exponent codes.
 - **2026-11:** We have integrated SplitZip into [Splash](https://github.com/incoai/splash) as a general-purpose KV compression method. Check out our [Pull Request #630](https://github.com/incoai/splash/pull/630) for more details.
 - **2026-09:** SplitZip is accepted to **NeurIPS 2026**.
 - **2026-06-05:** This repository is released.
@@ -61,6 +62,7 @@ throughput measurements used in the paper.
 - Lossless BF16 KV cache compression with bitwise round-trip recovery.
 - Offline-calibrated, Top-16 exponent codebooks with chunk-local sparse escape metadata.
 - GPU encode and decode kernels implemented in Triton.
+- FP8 kernels for E4M3 and E5M2 KV caches, with 2-, 3- and 4-bit exponent codes.
 - Reproduction scripts for WikiText-2/Qwen3-32B exponent statistics and codec-path throughput.
 - Paper-reported codec-only throughput on real BF16 KV activations: 613.3 GB/s encode and 2181.8 GB/s decode.
 - Exercised in an out-of-tree SGLang disaggregated-serving path using Mooncake for KV-cache transfer. 
@@ -121,6 +123,34 @@ print(coverage, encoded.compressed_bytes)
 ```
 The current public codec API is stateful. The encoded objects are intended to be decoded with the same calibrated codec state. For paper-style experiments, calibrate the codebook on a separate calibration set rather than on the benchmark tensor itself.
 
+### FP8 codec
+
+`codec_fp8_gpu.py` applies the same scheme to FP8 KV caches: a calibrated
+exponent codebook with fixed-width codes, sign and mantissa bits stored
+unchanged, and a chunk-local escape stream for rare exponents. It supports
+E4M3 with 2- or 3-bit codes and E5M2 with 2-, 3- or 4-bit codes.
+
+```python
+import torch
+
+from codec_fp8_gpu import SplitZipFP8GPU
+
+x = torch.randn(1024, 4096, device="cuda").to(torch.float8_e5m2)
+
+codec = SplitZipFP8GPU("e5m2", code_bits=3, device="cuda")
+coverage = codec.calibrate(x)
+
+encoded = codec.encode(x)
+decoded = codec.decode(encoded)  # flat uint8 view of the original bytes
+
+assert torch.equal(x.view(torch.uint8).reshape(-1), decoded)
+print(coverage, encoded.compressed_bytes)
+```
+
+Choose the code width from the calibration coverage: a width whose codebook
+covers too few exponents sends many values through the escape stream and can
+expand the data.
+
 ## Quick Start
 
 Run a small codec smoke test with synthetic BF16 data:
@@ -147,6 +177,7 @@ This initial release includes:
 - A stateful calibrated codec API for bitwise BF16 round-trip recovery.
 - BF16 exponent-statistics analysis for Qwen3-32B/WikiText-2 style runs.
 - Codec-path throughput benchmarking.
+- Standalone Triton encode/decode kernels for FP8 (E4M3, E5M2) CUDA tensors.
 
 ## Reproducing Paper Artifact Scripts
 
@@ -218,7 +249,8 @@ bitwise identical to the originals.
 
 **Does it work with an FP8 KV cache?**
 Yes. Applied on top of FP8 (E5M2) it gives up to 1.14× additional compression,
-with no further accuracy risk.
+with no further accuracy risk. The FP8 kernels (E4M3 and E5M2) are in
+`codec_fp8_gpu.py`.
 
 **Which serving stacks does it work with?**
 It has been evaluated in SGLang PD disaggregation with Mooncake as the KV transfer
@@ -235,6 +267,7 @@ works alongside them.
 ## Repository Contents
 
 - `codec_gpu.py`: public ChunkLocalSplitZipGPU Triton codec.
+- `codec_fp8_gpu.py`: SplitZipFP8GPU Triton codec for FP8 (E4M3, E5M2) tensors.
 - `bench_codec_throughput.py`: encode/decode throughput benchmark for the public
   codec API.
 - `analyze_bf16_exponent_entropy_qwen32.py`: BF16 KV exponent entropy and
